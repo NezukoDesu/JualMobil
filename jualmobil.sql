@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 29, 2025 at 06:37 AM
--- Server version: 10.4.27-MariaDB
--- PHP Version: 8.4.6
+-- Generation Time: Apr 29, 2025 at 10:19 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -57,7 +57,7 @@ CREATE TABLE `mobil` (
 
 INSERT INTO `mobil` (`id`, `nama`, `stok`, `harga`, `keterangan`, `gambar`) VALUES
 (1, 'Avanza', 2, 100000, 'Tidak Ada', 'b.jpg'),
-(3, 'b', 3, 10000, 'Tidak Ada', 'a.jpg');
+(3, 'b', 2, 10000, 'Tidak Ada', 'a.jpg');
 
 -- --------------------------------------------------------
 
@@ -86,10 +86,17 @@ CREATE TABLE `requests` (
   `id` int(11) NOT NULL,
   `itemId` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
-  `status` varchar(255) NOT NULL,
+  `status` enum('Menunggu','Disetujui','Ditolak') NOT NULL DEFAULT 'Menunggu',
   `createdAt` datetime DEFAULT current_timestamp(),
   `updatedAt` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `requests`
+--
+
+INSERT INTO `requests` (`id`, `itemId`, `userId`, `status`, `createdAt`, `updatedAt`) VALUES
+(31, 3, 10, 'Disetujui', '2025-04-29 15:16:06', '2025-04-29 15:16:40');
 
 -- --------------------------------------------------------
 
@@ -147,7 +154,9 @@ ALTER TABLE `notifications`
 -- Indexes for table `requests`
 --
 ALTER TABLE `requests`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_request_mobil` (`itemId`),
+  ADD KEY `fk_request_user` (`userId`);
 
 --
 -- Indexes for table `users`
@@ -181,7 +190,7 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `requests`
 --
 ALTER TABLE `requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -205,6 +214,13 @@ ALTER TABLE `messages`
 --
 ALTER TABLE `notifications`
   ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `requests`
+--
+ALTER TABLE `requests`
+  ADD CONSTRAINT `fk_request_mobil` FOREIGN KEY (`itemId`) REFERENCES `mobil` (`id`),
+  ADD CONSTRAINT `fk_request_user` FOREIGN KEY (`userId`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

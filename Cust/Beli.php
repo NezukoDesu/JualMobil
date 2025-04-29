@@ -1,88 +1,70 @@
 <?php
-include '../DB.php'; // Koneksi ke database
+include '../DB.php';
 session_start();
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'Customer') {
-    echo "Access denied! Redirecting to login...";
-    header("Location: /JualMobil/Login.php");
+// Cek dulu, user udah login belum dan apakah dia role-nya "Customer"
+if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'Customer') {
+    // Kalau belum login atau bukan customer, langsung tendang ke halaman login
+    header("Location: ../Login.php");
     exit;
 }
 
+// Ambil ID user berdasarkan username yang login
+$stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+$stmt->bind_param('s', $_SESSION['username']);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+$userId = $user['id'];
+
+// Cek ID mobil 
 if (!isset($_GET['id'])) {
     echo "Mobil tidak ditemukan!";
     exit;
 }
 
 $mobilId = $_GET['id'];
-$query = "SELECT * FROM mobil WHERE id = ?";
+$query = "SELECT * FROM mobil WHERE id = ? AND stok > 0"; // Ambil mobil yang masih ready
 $stmt = $conn->prepare($query);
 $stmt->bind_param('i', $mobilId);
 $stmt->execute();
 $result = $stmt->get_result();
 
+// Kalau mobilnya gak ada atau stoknya 0
 if ($result->num_rows === 0) {
-    echo "Mobil tidak ditemukan!";
+    echo "Mobil tidak tersedia!";
     exit;
 }
 
 $mobil = $result->fetch_assoc();
 
-// Proses pengajuan pemesanan
+// Kalau form dibuka lewat tombol submit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $userId = $_SESSION['id']; 
-    $status = 'Menunggu';
-    $createdAt = date('Y-m-d H:i:s');
-    $updatedAt = date('Y-m-d H:i:s');
-
-    $insertQuery = "INSERT INTO requests (itemId, userid, status, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?)";
-    $insertStmt = $conn->prepare($insertQuery);
-    $insertStmt->bind_param('iisss', $mobilId, $userId, $status, $createdAt, $updatedAt);
-
-    if ($insertStmt->execute()) {
-        echo "<script>alert('Pesanan berhasil diajukan!'); window.location.href = '/JualMobil/Customer/request.php';</script>";
+    // Cek dulu apakah user udah pernah ngajuin request buat mobil ini dan masih nunggu
+    $checkQuery = "SELECT id FROM requests WHERE userId = ? AND itemId = ? AND status = 'Menunggu'";
+    $checkStmt = $conn->prepare($checkQuery);
+    $checkStmt->bind_param('ii', $userId, $mobilId);
+    $checkStmt->execute();
+    
+    if ($checkStmt->get_result()->num_rows > 0) {
+        // Udah pernah request, kasih alert
+        echo "<script>alert('Anda sudah memiliki pengajuan yang menunggu untuk mobil ini!');</script>";
     } else {
-        echo "<script>alert('Terjadi kesalahan saat memproses pesanan!');</script>";
+        // Kalau belum pernah, simpan request baru ke database
+        $insertQuery = "INSERT INTO requests (itemId, userId, status) VALUES (?, ?, 'Menunggu')";
+        $insertStmt = $conn->prepare($insertQuery);
+        $insertStmt->bind_param('ii', $mobilId, $userId);
+
+        if ($insertStmt->execute()) {
+            // Kalau sukses, kasih alert dan arahkan ke halaman request
+            echo "<script>
+                alert('Pesanan berhasil diajukan!'); 
+                window.location.href = 'Request.php';
+            </script>";
+        } else {
+            // Kalau gagal, kasih alert error
+            echo "<script>alert('Terjadi kesalahan saat memproses pesanan!');</script>";
+        }
     }
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Mobil</title>
-    <!-- Link ke Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5 flex justify-center items-center h-full">
-        <div class="bg-white rounded shadow p-4 relative" style="width: 500px; height: 500px;">
-        <div class="p-8" style="width: 400px; height: 200px; margin: 0 auto;">
-            <!-- Gambar -->
-            <img style="width: 400px; height:200px; object-fit: cover;" src="/JualMobil/uploads/<?= htmlspecialchars($mobil['gambar']) ?>" alt="<?= htmlspecialchars($mobil['nama']) ?>" class="w-full h-48 object-cover rounded mb-4">
-
-            <!-- Info Mobil -->
-            <strong style="font-size:larger;">Nama : </strong><h5 style="font-size:larger;" class="text-xl font-semibold text-left"><?= htmlspecialchars($mobil['nama'] ?? 'Nama tidak tersedia'); ?></h5>
-            <p  style="font-size:larger ;"class="text-sm text-gray-600 mb-1 text-left">
-            <strong>Stok : </strong> <?= htmlspecialchars($mobil['stok'] ?? 'Tidak tersedia'); ?>
-            </p>
-            <p style="font-size:larger ;" class="text-sm text-gray-600 mb-1 text-left">
-            <strong >Harga : </strong> Rp <?= number_format($mobil['harga'] ?? 0, 0, ',', '.'); ?>
-            </p>
-            <strong style="font-size:larger ;">Keterangan :</strong><br><p style="font-size:larger ;" class="text-sm text-gray-600 mb-4 text-left"><?= nl2br(htmlspecialchars($mobil['keterangan'] ?? 'Tidak ada keterangan')); ?></p>
-
-
-            <!-- Action Buttons -->
-            <div class="flex justify-center mt-4">
-                <form method="POST" class="flex flex-col items-center gap-2">
-                    <button type="submit" class="btn btn-primary w-full">Beli Mobil</button>
-                    <a href="../Index.php" class="btn btn-secondary w-full">Kembali</a>
-                </form>
-            </div>
-        </div>
-        </div>
-    </div>
-</body>
-
-</html>

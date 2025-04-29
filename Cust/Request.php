@@ -1,18 +1,36 @@
 <?php
-include '../DB.php'; // Menyertakan koneksi database
+include '../DB.php';
 session_start();
 
-// Periksa sesi dan role pengguna
-if (!isset($_SESSION['role'])) {
-    echo "Access denied! Redirecting to login...";
-    header("Location: /JualMobil/Login.php"); // Ganti dengan URL halaman login Anda
+// Security check
+if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'Customer') {
+    header("Location: ../Login.php");
     exit;
 }
 
-// Query database untuk mendapatkan data dari tabel `requests`
-$query = "SELECT r.*, m.nama AS mobilNama FROM requests r JOIN mobil m ON r.itemId = m.id WHERE r.userId = ?";
+// Get data user id
+$stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+$stmt->bind_param('s', $_SESSION['username']);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+$userId = $user['id'];
+
+// get semua data request dengan detail
+$query = "SELECT 
+    r.id,
+    r.status,
+    r.createdAt,
+    m.nama AS mobilNama,
+    m.harga AS mobilHarga,
+    m.stok AS mobilStok
+    FROM requests r
+    JOIN mobil m ON r.itemId = m.id
+    WHERE r.userId = ?
+    ORDER BY r.createdAt DESC";
+
 $stmt = $conn->prepare($query);
-$stmt->bind_param('i', $_SESSION['userId']);
+$stmt->bind_param('i', $userId);
 $stmt->execute();
 $result = $stmt->get_result();
 ?>
@@ -54,6 +72,7 @@ $result = $stmt->get_result();
                 <tr class="table-primary">
                     <th>No.</th>
                     <th>Nama Mobil</th>
+                    <th>Harga</th>
                     <th>Tanggal Pemesanan</th>
                     <th>Status</th>
                 </tr>
@@ -66,6 +85,7 @@ $result = $stmt->get_result();
                         echo "<tr>";
                         echo "<td>{$no}</td>";
                         echo "<td>{$row['mobilNama']}</td>";
+                        echo "<td>" . number_format($row['mobilHarga'], 0, ',', '.') . "</td>";
                         echo "<td>{$row['createdAt']}</td>";
                         echo "<td>";
                         if ($row['status'] == 'Disetujui') {
@@ -80,7 +100,7 @@ $result = $stmt->get_result();
                         $no++;
                     }
                 } else {
-                    echo "<tr><td colspan='4' class='text-center'>Tidak ada data.</td></tr>";
+                    echo "<tr><td colspan='5' class='text-center'>Tidak ada data.</td></tr>";
                 }
                 ?>
             </tbody>
