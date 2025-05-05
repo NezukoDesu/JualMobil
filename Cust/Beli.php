@@ -68,3 +68,94 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajukan Mobil</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .mobil-info {
+            margin: 20px 0;
+        }
+        .mobil-info img {
+            width: 100%;
+            max-width: 400px;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            display: block;
+            margin: 0 auto 15px auto;
+        }
+        .mobil-info p {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Ajukan Permintaan Mobil</h2>
+
+        <div class="mobil-info">
+            <img src="../uploads/<?= htmlspecialchars($mobil['gambar']) ?>" alt="<?= htmlspecialchars($mobil['nama']) ?>">
+            <p><strong>Nama Mobil:</strong> <?= htmlspecialchars($mobil['nama']) ?></p>
+            <p><strong>Stok Tersedia:</strong> <?= $mobil['stok'] ?></p>
+            <p><strong>Harga:</strong> Rp<?= number_format($mobil['harga'], 0, ',', '.') ?></p>
+            <p><strong>Keterangan:</strong> <?= htmlspecialchars($mobil['keterangan']) ?></p>
+        </div>
+
+        <form method="POST">
+            <button type="submit" class="btn-submit">Ajukan Sekarang</button>
+        </form>
+
+        <a href="Request.php" class="back-link">← Kembali ke Daftar Permintaan</a>
+    </div>
+</body>
+</html>
+
+
