@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 29, 2025 at 10:19 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Generation Time: May 26, 2025 at 07:11 PM
+-- Server version: 10.4.27-MariaDB
+-- PHP Version: 8.4.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -36,6 +36,30 @@ CREATE TABLE `messages` (
   `updatedAt` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `messages`
+--
+
+INSERT INTO `messages` (`id`, `senderId`, `receiverId`, `message`, `createdAt`, `updatedAt`) VALUES
+(1, 11, 12, 'halo', '2025-05-26 18:30:54', '2025-05-26 18:30:54'),
+(2, 12, 11, 'halo', '2025-05-26 18:33:56', '2025-05-26 18:33:56'),
+(3, 12, 10, 'halo', '2025-05-26 18:34:00', '2025-05-26 18:34:00'),
+(4, 10, 12, 'halo', '2025-05-26 18:36:35', '2025-05-26 18:36:35'),
+(5, 11, 12, 'Halo Apa Kabar', '2025-05-26 18:36:55', '2025-05-26 18:36:55'),
+(6, 12, 11, 'Halo', '2025-05-26 18:37:14', '2025-05-26 18:37:14'),
+(7, 11, 12, 'halo', '2025-05-26 18:39:11', '2025-05-26 18:39:11'),
+(8, 12, 11, 'halo', '2025-05-26 18:39:18', '2025-05-26 18:39:18'),
+(9, 12, 11, 'halo bos', '2025-05-26 18:41:45', '2025-05-26 18:41:45'),
+(10, 11, 12, 'halo dek', '2025-05-26 18:41:53', '2025-05-26 18:41:53'),
+(11, 12, 11, 'halo pak', '2025-05-26 18:43:36', '2025-05-26 18:43:36'),
+(12, 11, 12, 'halo pak', '2025-05-26 18:43:41', '2025-05-26 18:43:41'),
+(13, 12, 11, 'tes', '2025-05-26 18:43:45', '2025-05-26 18:43:45'),
+(14, 11, 12, 'tes', '2025-05-26 18:46:40', '2025-05-26 18:46:40'),
+(15, 12, 11, 'lala', '2025-05-26 18:46:43', '2025-05-26 18:46:43'),
+(16, 10, 12, 'Halo Bro', '2025-05-26 18:47:06', '2025-05-26 18:47:06'),
+(17, 12, 10, 'apa kabar', '2025-05-26 18:47:12', '2025-05-26 18:47:12'),
+(18, 10, 12, 'hehe', '2025-05-26 18:47:16', '2025-05-26 18:47:16');
+
 -- --------------------------------------------------------
 
 --
@@ -56,8 +80,17 @@ CREATE TABLE `mobil` (
 --
 
 INSERT INTO `mobil` (`id`, `nama`, `stok`, `harga`, `keterangan`, `gambar`) VALUES
-(1, 'Avanza', 2, 100000, 'Tidak Ada', 'b.jpg'),
-(3, 'b', 2, 10000, 'Tidak Ada', 'a.jpg');
+(1, 'Chery Omoda GT', 20, 518800000, 'Chery OMODA 5 GT adalah varian tertinggi dari keluarga OMODA 5, yang ditawarkan dengan mesin bensin 1.600 cc Turbo, transmisi 7-Speed Dual Clutch (DCT), dan penggerak roda depan (FWD) atau semua roda (AWD).', 'omoda gt.jpg'),
+(3, 'Chery J6', 20, 595800000, 'Chery J6 adalah mobil SUV listrik dari Chery yang menawarkan desain boxy yang unik, kemampuan off-road, dan berbagai fitur modern. Mobil ini hadir dalam beberapa varian, termasuk RWD dan IWD, dengan pilihan baterai berkapasitas berbeda yang mempengaruhi jarak tempuh. ', 'j6.jpg'),
+(6, 'Chery Omoda E5', 20, 518800000, 'Omoda E5 EV adalah mobil listrik yang diproduksi oleh Chery. Mobil ini memiliki desain SUV, panjang 4424 mm, lebar 1830 mm, dan tinggi 1588 mm, serta ground clearance 190 mm, cocok untuk penggunaan di perkotaan. Omoda E5 EV menggunakan tenaga listrik dan memiliki jangkauan hingga 430 km (WLTP) atau 505 km (NEDC). ', 'omoda ev.jpg'),
+(7, 'Chery Tiggo Cross', 20, 299800000, 'Chery Tiggo Cross adalah crossover 5-seater yang tersedia dalam dua varian, Comfort dan Premium, dengan harga mulai dari Rp 259,5 juta untuk Comfort dan Rp 289,5 juta untuk Premium. Tiggo Cross memiliki mesin 1.500 cc naturally aspirated 4 silinder yang menghasilkan 114 HP dan torsi 138 Nm, dengan transmisi CVT. ', 'tigoo cross.jpg'),
+(8, 'Chery Tiggo 8 CSH', 20, 529800000, 'Tiggo 8 CSH adalah SUV 7-seater dengan teknologi hybrid yang menggabungkan mesin bensin dan motor listrik, memberikan performa yang bertenaga dan irit. Ia memiliki sistem pengisian daya listrik dan dapat dioperasikan dalam mode EV (listrik murni) hingga 90 km. Tiggo 8 CSH juga dilengkapi dengan berbagai fitur canggih, seperti layar 15,6 inci 2.5K high-definition, kamera 540 HD Panoramic, dan pengisian daya nirkabel 50W. ', 'tigoo 8 csh.jpg'),
+(12, 'Chery Omoda Z', 20, 368800000, 'Chery Omoda 5 Z adalah sebuah crossover 5 kursi dari Chery yang dijual di Indonesia dengan harga mulai dari Rp 334 juta (OTR Jakarta). Mobil ini ditenagai mesin 1,5L TCI yang menghasilkan tenaga 145 hp dan torsi 230 Nm, dengan transmisi 9 CVT. ', 'omoda z.jpg'),
+(13, 'Chery Omoda RZ', 20, 435800000, 'Omoda RZ', 'omoda rz.jpg'),
+(14, 'Chery Tiggo 5X', 20, 299800000, 'Tiggo 5X', 'tigoo 5x.jpg'),
+(15, 'Chery Tiggo 8', 20, 399800000, 'Tiggo 8', 'Tigoo 8.jpg'),
+(17, 'Chery Tiggo 8 Pro', 20, 598800000, 'Tiggo 8 Pro', 'tigoo 8 pro.jpg'),
+(18, 'Chery Tiggo 7 Pro', 20, 299800000, 'Tiggo 7 Pro', 'tigoo 7 pro.jpg');
 
 -- --------------------------------------------------------
 
@@ -96,7 +129,11 @@ CREATE TABLE `requests` (
 --
 
 INSERT INTO `requests` (`id`, `itemId`, `userId`, `status`, `createdAt`, `updatedAt`) VALUES
-(31, 3, 10, 'Disetujui', '2025-04-29 15:16:06', '2025-04-29 15:16:40');
+(31, 3, 10, 'Disetujui', '2025-04-29 15:16:06', '2025-04-29 15:16:40'),
+(32, 3, 10, 'Disetujui', '2025-05-05 22:56:09', '2025-05-05 22:56:28'),
+(33, 3, 10, 'Disetujui', '2025-05-05 22:58:41', '2025-05-26 11:11:59'),
+(34, 3, 26, 'Disetujui', '2025-05-26 11:11:26', '2025-05-26 11:11:52'),
+(35, 1, 26, 'Ditolak', '2025-05-26 11:11:33', '2025-05-26 11:11:55');
 
 -- --------------------------------------------------------
 
@@ -123,7 +160,8 @@ INSERT INTO `users` (`id`, `email`, `username`, `password`, `role`, `foto`) VALU
 (10, 'Customer@gmail.com', 'Customer', '$2y$12$fSKNENrOBsar1Dus9zQKueHhSMtA61Vwx7KnuurJaMYD5OzzZUvRe', 'Customer', '6805221272060.jpg'),
 (11, '', 'Manager', '$2y$12$9AGEJU2Ix/Bxv1XSFrNs4ejbg3xekF31VQLVhaSC8hHgetDNDkeTe', 'Manager', ''),
 (12, '', 'Sales', '$2y$12$/9CNb0xXP.RH24LmdrEzv.gBwd7y5oT9.XaNxmbZeeGON0rFJSiSG', 'Sales', ''),
-(25, 'tes@gmail.com', 'tes', '$2y$12$/pkXXGV2Vkbgy6ly3Vyxk.qsgnJmQEi/0qsYG078AQH26KVALe6pi', 'Customer', '');
+(25, 'tes@gmail.com', 'tes', '$2y$12$/pkXXGV2Vkbgy6ly3Vyxk.qsgnJmQEi/0qsYG078AQH26KVALe6pi', 'Customer', ''),
+(26, 'b@gmail.com', 'b', '$2y$12$v9msQdwNW97CsKA.QYvtUOc8ok.C9MSmaWgJjxHpfyDjcxV6ktPQO', 'Customer', '6833e9e4a436d_QRCode_6QYBoN.png');
 
 --
 -- Indexes for dumped tables
@@ -134,8 +172,8 @@ INSERT INTO `users` (`id`, `email`, `username`, `password`, `role`, `foto`) VALU
 --
 ALTER TABLE `messages`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_sender` (`senderId`),
-  ADD KEY `fk_receiver` (`receiverId`);
+  ADD KEY `senderId` (`senderId`),
+  ADD KEY `receiverId` (`receiverId`);
 
 --
 -- Indexes for table `mobil`
@@ -155,8 +193,8 @@ ALTER TABLE `notifications`
 --
 ALTER TABLE `requests`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_request_mobil` (`itemId`),
-  ADD KEY `fk_request_user` (`userId`);
+  ADD KEY `itemId` (`itemId`),
+  ADD KEY `userId` (`userId`);
 
 --
 -- Indexes for table `users`
@@ -172,31 +210,31 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `mobil`
 --
 ALTER TABLE `mobil`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `requests`
 --
 ALTER TABLE `requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- Constraints for dumped tables
@@ -206,8 +244,8 @@ ALTER TABLE `users`
 -- Constraints for table `messages`
 --
 ALTER TABLE `messages`
-  ADD CONSTRAINT `fk_receiver` FOREIGN KEY (`receiverId`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `fk_sender` FOREIGN KEY (`senderId`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`senderId`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`receiverId`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `notifications`
@@ -219,8 +257,8 @@ ALTER TABLE `notifications`
 -- Constraints for table `requests`
 --
 ALTER TABLE `requests`
-  ADD CONSTRAINT `fk_request_mobil` FOREIGN KEY (`itemId`) REFERENCES `mobil` (`id`),
-  ADD CONSTRAINT `fk_request_user` FOREIGN KEY (`userId`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `requests_ibfk_1` FOREIGN KEY (`itemId`) REFERENCES `mobil` (`id`),
+  ADD CONSTRAINT `requests_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
