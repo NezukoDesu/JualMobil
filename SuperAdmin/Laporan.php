@@ -1,12 +1,26 @@
 <?php
 session_start();
 include('../DB.php');
+
+// Hanya untuk Super Admin dan Manager
 if (!isset($_SESSION['username']) || ($_SESSION['role'] !== 'Super Admin' && $_SESSION['role'] !== 'Manager')) {
     header("Location: ../Login.php");
     exit;
 }
 
-// get semua data request dengan detail
+// Pagination
+$limit = 10;
+$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$offset = ($page - 1) * $limit;
+
+// Hitung total data
+$totalQuery = "SELECT COUNT(*) AS total FROM requests";
+$totalResult = mysqli_query($conn, $totalQuery);
+$totalRow = mysqli_fetch_assoc($totalResult);
+$totalData = $totalRow['total'];
+$totalPages = ceil($totalData / $limit);
+
+// Ambil data sesuai halaman
 $query = "SELECT 
     r.id,
     r.status,
@@ -18,7 +32,8 @@ $query = "SELECT
     FROM requests r
     JOIN mobil m ON r.itemId = m.id
     JOIN users u ON r.userId = u.id
-    ORDER BY r.createdAt DESC";
+    ORDER BY r.createdAt DESC
+    LIMIT $limit OFFSET $offset";
 
 $result = mysqli_query($conn, $query);
 ?>
@@ -27,7 +42,6 @@ $result = mysqli_query($conn, $query);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan Pemesanan</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
@@ -40,8 +54,8 @@ $result = mysqli_query($conn, $query);
 <body>
     <div class="container mt-5">
         <h2 class="mb-4">Laporan Pemesanan Mobil</h2>
-        
-        <!-- Filter  status dipesanan -->
+
+        <!-- Filter Status -->
         <div class="mb-3">
             <select class="form-select w-25" id="statusFilter">
                 <option value="">Semua Status</option>
@@ -52,8 +66,8 @@ $result = mysqli_query($conn, $query);
         </div>
 
         <table class="table table-bordered">
-            <thead>
-                <tr class="table-primary">
+            <thead class="table-primary">
+                <tr>
                     <th>No.</th>
                     <th>Tanggal Pesan</th>
                     <th>Customer</th>
@@ -68,7 +82,7 @@ $result = mysqli_query($conn, $query);
             <tbody>
                 <?php
                 if ($result && mysqli_num_rows($result) > 0) {
-                    $no = 1;
+                    $no = $offset + 1;
                     while ($row = mysqli_fetch_assoc($result)) {
                         echo "<tr class='status-row' data-status='{$row['status']}'>";
                         echo "<td>{$no}</td>";
@@ -76,31 +90,25 @@ $result = mysqli_query($conn, $query);
                         echo "<td>{$row['customerName']}</td>";
                         echo "<td>{$row['mobilNama']}</td>";
                         echo "<td>Rp " . number_format($row['mobilHarga'], 0, ',', '.') . "</td>";
-                        echo "<td>";
-                        $statusClass = match($row['status']) {
+                        echo "<td><span class='" . match($row['status']) {
                             'Disetujui' => 'status-disetujui',
                             'Ditolak' => 'status-ditolak',
                             default => 'status-menunggu'
-                        };
-                        echo "<span class='{$statusClass}'>{$row['status']}</span>";
-                        echo "</td>";
-                        
+                        } . "'>{$row['status']}</span></td>";
+
                         if ($_SESSION['role'] === 'Super Admin') {
                             echo "<td>";
                             if ($row['status'] === 'Menunggu') {
                                 echo "<button onclick='updateStatus({$row['id']}, \"Disetujui\")' class='btn btn-success btn-sm me-2'>Setuju</button>";
                                 echo "<button onclick='updateStatus({$row['id']}, \"Ditolak\")' class='btn btn-danger btn-sm'>Tolak</button>";
                             } else {
-                                // tampilkan note status pesanan
-                                if ($row['status'] === 'Disetujui') {
-                                    echo "<span class='text-success'><i class='bi bi-check-circle'></i> Disetujui oleh Admin</span>";
-                                } else if ($row['status'] === 'Ditolak') {
-                                    echo "<span class='text-danger'><i class='bi bi-x-circle'></i> Ditolak oleh Admin</span>";
-                                }
+                                echo $row['status'] === 'Disetujui'
+                                    ? "<span class='text-success'><i class='bi bi-check-circle'></i> Disetujui oleh Admin</span>"
+                                    : "<span class='text-danger'><i class='bi bi-x-circle'></i> Ditolak oleh Admin</span>";
                             }
                             echo "</td>";
                         }
-                        
+
                         echo "</tr>";
                         $no++;
                     }
@@ -110,24 +118,34 @@ $result = mysqli_query($conn, $query);
                 ?>
             </tbody>
         </table>
-        <a href="../Index.php" class="btn btn-secondary">Kembali</a>
+
+        <!-- Navigasi Pagination -->
+        <?php if ($totalPages > 1): ?>
+            <nav>
+                <ul class="pagination">
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <li class="page-item <?= ($i === $page) ? 'active' : '' ?>">
+                            <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+                </ul>
+            </nav>
+<?php endif; ?>
+
+
+        <a href="../Index.php" class="btn btn-secondary mb-3" style="margin-bottom:20px;">Kembali</a>
     </div>
 
     <script>
-        document.getElementById('statusFilter').addEventListener('change', function() {
+        // Filter status
+        document.getElementById('statusFilter').addEventListener('change', function () {
             const status = this.value;
             const rows = document.querySelectorAll('.status-row');
-            
             rows.forEach(row => {
-                if (!status || row.getAttribute('data-status') === status) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+                row.style.display = (!status || row.getAttribute('data-status') === status) ? '' : 'none';
             });
         });
 
-        // Update status
         function updateStatus(requestId, newStatus) {
             if (confirm(`Apakah Anda yakin ingin ${newStatus === 'Disetujui' ? 'menyetujui' : 'menolak'} pesanan ini?`)) {
                 fetch('UpdateStatus.php', {

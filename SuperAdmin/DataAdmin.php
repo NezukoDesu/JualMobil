@@ -13,7 +13,6 @@ if ($_SESSION['role'] !== 'Super Admin' && $_SESSION['role'] !== 'Manager') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['aksi'] === 'hapus_user') {
-    // Hanya Super Admin yang bisa menghapus
     if ($_SESSION['role'] !== 'Super Admin') {
         echo 'error: Unauthorized';
         exit;
@@ -24,15 +23,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['aksi'] === 'hapus_user') {
     $stmt = $conn->prepare("DELETE FROM users WHERE id = ?");
     $stmt->bind_param("i", $id);
 
-    if ($stmt->execute()) {
-        echo 'success';
-    } else {
-        echo 'error: ' . $stmt->error;
-    }
+    echo $stmt->execute() ? 'success' : 'error: ' . $stmt->error;
     exit;
 }
 
-$query = "SELECT * FROM users ORDER BY id ASC";
+// Pagination
+$limit = 10;
+$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$offset = ($page - 1) * $limit;
+
+// Total data
+$totalQuery = "SELECT COUNT(*) as total FROM users";
+$totalResult = mysqli_query($conn, $totalQuery);
+$totalData = mysqli_fetch_assoc($totalResult)['total'];
+$totalPages = ceil($totalData / $limit);
+
+// Ambil data per halaman dan urutkan dari terbaru
+$query = "SELECT * FROM users ORDER BY id DESC LIMIT $limit OFFSET $offset";
 $result = mysqli_query($conn, $query);
 ?>
 
@@ -40,7 +47,6 @@ $result = mysqli_query($conn, $query);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data User</title>
     <link rel="stylesheet" href="../Style/style.css">
     <style>
@@ -62,8 +68,6 @@ $result = mysqli_query($conn, $query);
         }
 
         .header h2 {
-            margin-bottom: 10px;
-            font-size: 24px;
             text-align: center;
         }
 
@@ -79,20 +83,13 @@ $result = mysqli_query($conn, $query);
 
         .styled-table th, .styled-table td {
             padding: 12px 16px;
-            text-align: left;
             border-bottom: 1px solid #ddd;
-        }
-
-        .styled-table tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
         }
 
         .btn {
             text-decoration: none;
             padding: 4px 8px;
-            margin-right: 5px;
             border-radius: 5px;
-            font-size: 14px;
         }
 
         .btn.edit {
@@ -103,11 +100,39 @@ $result = mysqli_query($conn, $query);
             color: #dc3545;
         }
 
-        .back-link {
-            display: inline-block;
+        .pagination {
             margin-top: 20px;
+            text-align: center;
+        }
+
+        .pagination a {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 0 4px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 6px;
             text-decoration: none;
-            color: #007bff;
+        }
+
+        .pagination a.active {
+            background-color: #0056b3;
+        }
+
+        .back-btn {
+            display: block;
+            width: 300px;
+            margin: 30px auto 0;
+            text-align: center;
+            background-color: #2563eb;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background-color: #1e40af;
         }
     </style>
 </head>
@@ -116,26 +141,26 @@ $result = mysqli_query($conn, $query);
 <div class="container">
     <div class="header">
         <h2>DAFTAR PENGGUNA</h2>
-        <p>Selamat datang, <?php echo htmlspecialchars($_SESSION['username']); ?>!</p>
+        <p>Selamat datang, <?= htmlspecialchars($_SESSION['username']); ?>!</p>
     </div>
 
     <table class="styled-table">
         <thead>
             <tr>
-                <th>No</th>
-                <th>Username</th>
-                <th>Role</th>
-                <th>Aksi</th>
+                <th style="text-align:left">No</th>
+                <th style="text-align:left">Username</th>
+                <th style="text-align:left">Role</th>
+                <th style="text-align:left">Aksi</th>
             </tr>
         </thead>
         <tbody>
-            <?php $no = 1; while ($user = mysqli_fetch_assoc($result)): ?>
+            <?php $no = $offset + 1; while ($user = mysqli_fetch_assoc($result)): ?>
                 <tr>
-                    <td><?php echo $no++; ?></td>
-                    <td><?php echo htmlspecialchars($user['username']); ?></td>
-                    <td><?php echo htmlspecialchars($user['role']); ?></td>
+                    <td><?= $no++; ?></td>
+                    <td><?= htmlspecialchars($user['username']); ?></td>
+                    <td><?= htmlspecialchars($user['role']); ?></td>
                     <td>
-                        <a href="EditRole.php?id=<?php echo urlencode($user['id']); ?>" class="btn edit">✏️</a>
+                        <a href="EditRole.php?id=<?= urlencode($user['id']); ?>" class="btn edit">✏️</a>
                         <?php if ($_SESSION['role'] === 'Super Admin'): ?>
                             <a href="#" class="btn delete delete-user" data-id="<?= $user['id']; ?>">🗑️</a>
                         <?php endif; ?>
@@ -145,7 +170,16 @@ $result = mysqli_query($conn, $query);
         </tbody>
     </table>
 
-    <button onclick="window.location.href='../Index.php'" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition duration-300" style="width: 300px; margin-top: 25px; margin-left: 700px;">← Kembali ke Halaman Utama</button>
+    <!-- Pagination hanya jika data lebih dari 10 -->
+    <?php if ($totalPages > 1): ?>
+    <div class="pagination">
+        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+            <a href="?page=<?= $i ?>" class="<?= $i == $page ? 'active' : '' ?>"><?= $i ?></a>
+        <?php endfor; ?>
+    </div>
+    <?php endif; ?>
+
+    <a href="../Index.php" class="back-btn">← Kembali ke Halaman Utama</a>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -154,24 +188,14 @@ $(document).on('click', '.delete-user', function(e) {
     e.preventDefault();
     if (confirm('Yakin ingin menghapus?')) {
         const id = $(this).data('id');
-
-        $.ajax({
-            url: '',
-            method: 'POST',
-            data: {
-                aksi: 'hapus_user',
-                id: id
-            },
-            success: function(res) {
-                if (res.trim() === 'success') {
-                    location.reload();
-                } else {
-                    alert('Gagal menghapus: ' + res);
-                }
-            },
-            error: function() {
-                alert('Terjadi kesalahan saat menghapus.');
+        $.post('', { aksi: 'hapus_user', id: id }, function(res) {
+            if (res.trim() === 'success') {
+                location.reload();
+            } else {
+                alert('Gagal menghapus: ' + res);
             }
+        }).fail(function() {
+            alert('Terjadi kesalahan saat menghapus.');
         });
     }
 });

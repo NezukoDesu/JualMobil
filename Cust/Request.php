@@ -106,7 +106,7 @@ $result = $stmt->get_result();
             </tbody>
         </table>
         <div class="text-center mt-4">
-            <a href="../index.php" class="btn btn-secondary">← Kembali ke Beranda</a>
+            <a href="../index.php" class="btn btn-secondary" style="margin-bottom:20px;">← Kembali ke Beranda</a>
         </div>
     </div>
 </body>

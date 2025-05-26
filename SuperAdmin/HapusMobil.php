@@ -2,22 +2,21 @@
 session_start();
 include '../DB.php';
 
-// Pastikan hanya yang login dapat mengakses
-if (!isset($_SESSION['username'])) {
+// Pastikan hanya user yang sudah login dan memiliki role yang boleh menghapus
+if (!isset($_SESSION['username']) || ($_SESSION['role'] !== 'Super Admin' && $_SESSION['role'] !== 'Manager')) {
     echo 'unauthorized';
     exit;
 }
 
 if (isset($_POST['id'])) {
-    $id = $_POST['id'];
+    $id = intval($_POST['id']);
 
-    // Query untuk menghapus data mobil berdasarkan ID
     $query = "DELETE FROM mobil WHERE id = ?";
     $stmt = mysqli_prepare($conn, $query);
 
     if (!$stmt) {
         echo 'failed_to_prepare';
-        exit; // Jika gagal menyiapkan query
+        exit;
     }
 
     mysqli_stmt_bind_param($stmt, 'i', $id);
@@ -25,10 +24,10 @@ if (isset($_POST['id'])) {
     if (mysqli_stmt_execute($stmt)) {
         echo 'success';
     } else {
-        // Mengambil alasan kegagalan dari MySQL
-        $error_message = mysqli_error($conn);
-        echo 'fail: ' . $error_message;
+        echo 'fail: ' . mysqli_error($conn);
     }
+
+    mysqli_stmt_close($stmt);
 } else {
     echo 'fail: Missing ID';
 }
