@@ -83,9 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <!-- Keterangan -->
       <div>
         <label class="block font-semibold mb-1">Keterangan</label>
-        <textarea name="keterangan" rows="4" class="border border-gray-300 p-2 w-full rounded" required></textarea>
+        <textarea name="keterangan" rows="4" class="border border-gray-300 p-2 w-full rounded" required minlength="200"></textarea>
       </div>
-
       <!-- Tombol Simpan -->
       <div class="flex justify-between items-center">
         <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">

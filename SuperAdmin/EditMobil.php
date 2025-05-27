@@ -115,7 +115,7 @@ if ($id) {
       <!-- Keterangan -->
       <div>
         <label class="block font-semibold mb-1">Keterangan</label>
-        <textarea name="keterangan" rows="4" class="border border-gray-300 p-2 w-full rounded" required><?= htmlspecialchars($mobil['keterangan']) ?></textarea>
+        <textarea name="keterangan" rows="4" class="border border-gray-300 p-2 w-full rounded" required minlength="200"><?= htmlspecialchars($mobil['keterangan']) ?></textarea>
       </div>
 
       <!-- Tombol Simpan -->

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 26, 2025 at 07:11 PM
+-- Generation Time: May 27, 2025 at 08:31 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.4.6
 
@@ -81,16 +81,16 @@ CREATE TABLE `mobil` (
 
 INSERT INTO `mobil` (`id`, `nama`, `stok`, `harga`, `keterangan`, `gambar`) VALUES
 (1, 'Chery Omoda GT', 20, 518800000, 'Chery OMODA 5 GT adalah varian tertinggi dari keluarga OMODA 5, yang ditawarkan dengan mesin bensin 1.600 cc Turbo, transmisi 7-Speed Dual Clutch (DCT), dan penggerak roda depan (FWD) atau semua roda (AWD).', 'omoda gt.jpg'),
-(3, 'Chery J6', 20, 595800000, 'Chery J6 adalah mobil SUV listrik dari Chery yang menawarkan desain boxy yang unik, kemampuan off-road, dan berbagai fitur modern. Mobil ini hadir dalam beberapa varian, termasuk RWD dan IWD, dengan pilihan baterai berkapasitas berbeda yang mempengaruhi jarak tempuh. ', 'j6.jpg'),
+(3, 'Chery J6', 20, 595800000, 'Chery J6 adalah mobil SUV listrik dari Chery yang menawarkan desain boxy yang unik, kemampuan off-road, dan berbagai fitur modern. Mobil ini hadir dalam beberapa varian, termasuk RWD dan IWD, dengan pilihan baterai berkapasitas berbeda yang mempengaruhi jarak tempuh.', 'j6.jpg'),
 (6, 'Chery Omoda E5', 20, 518800000, 'Omoda E5 EV adalah mobil listrik yang diproduksi oleh Chery. Mobil ini memiliki desain SUV, panjang 4424 mm, lebar 1830 mm, dan tinggi 1588 mm, serta ground clearance 190 mm, cocok untuk penggunaan di perkotaan. Omoda E5 EV menggunakan tenaga listrik dan memiliki jangkauan hingga 430 km (WLTP) atau 505 km (NEDC). ', 'omoda ev.jpg'),
 (7, 'Chery Tiggo Cross', 20, 299800000, 'Chery Tiggo Cross adalah crossover 5-seater yang tersedia dalam dua varian, Comfort dan Premium, dengan harga mulai dari Rp 259,5 juta untuk Comfort dan Rp 289,5 juta untuk Premium. Tiggo Cross memiliki mesin 1.500 cc naturally aspirated 4 silinder yang menghasilkan 114 HP dan torsi 138 Nm, dengan transmisi CVT. ', 'tigoo cross.jpg'),
 (8, 'Chery Tiggo 8 CSH', 20, 529800000, 'Tiggo 8 CSH adalah SUV 7-seater dengan teknologi hybrid yang menggabungkan mesin bensin dan motor listrik, memberikan performa yang bertenaga dan irit. Ia memiliki sistem pengisian daya listrik dan dapat dioperasikan dalam mode EV (listrik murni) hingga 90 km. Tiggo 8 CSH juga dilengkapi dengan berbagai fitur canggih, seperti layar 15,6 inci 2.5K high-definition, kamera 540 HD Panoramic, dan pengisian daya nirkabel 50W. ', 'tigoo 8 csh.jpg'),
 (12, 'Chery Omoda Z', 20, 368800000, 'Chery Omoda 5 Z adalah sebuah crossover 5 kursi dari Chery yang dijual di Indonesia dengan harga mulai dari Rp 334 juta (OTR Jakarta). Mobil ini ditenagai mesin 1,5L TCI yang menghasilkan tenaga 145 hp dan torsi 230 Nm, dengan transmisi 9 CVT. ', 'omoda z.jpg'),
-(13, 'Chery Omoda RZ', 20, 435800000, 'Omoda RZ', 'omoda rz.jpg'),
-(14, 'Chery Tiggo 5X', 20, 299800000, 'Tiggo 5X', 'tigoo 5x.jpg'),
-(15, 'Chery Tiggo 8', 20, 399800000, 'Tiggo 8', 'Tigoo 8.jpg'),
-(17, 'Chery Tiggo 8 Pro', 20, 598800000, 'Tiggo 8 Pro', 'tigoo 8 pro.jpg'),
-(18, 'Chery Tiggo 7 Pro', 20, 299800000, 'Tiggo 7 Pro', 'tigoo 7 pro.jpg');
+(13, 'Chery Omoda RZ', 20, 435800000, 'Chery Omoda 5 RZ adalah varian tertinggi dari SUV kompak Chery Omoda 5. Varian ini menawarkan spesifikasi dan fitur yang lebih lengkap dibandingkan dengan varian Z, seperti mesin 1.5L turbo, transmisi 9-speed CVT, dan berbagai fitur kenyamanan serta keamanan. Omoda 5 RZ juga memiliki desain eksterior dan interior yang lebih mewah dan stylish. ', 'omoda rz.jpg'),
+(14, 'Chery Tiggo 5X', 20, 299800000, 'Chery Tiggo 5X adalah sebuah SUV kompak yang menawarkan desain modern, fitur canggih, dan performa andal, cocok untuk mobilitas sehari-hari maupun perjalanan antar kota. Mobil ini memiliki mesin 1.500 cc bensin yang menghasilkan tenaga 112 HP dan torsi 138 Nm, dipadukan dengan transmisi otomatis 6 percepatan CVT. ', 'tigoo 5x.jpg'),
+(15, 'Chery Tiggo 8', 20, 399800000, 'Chery Tiggo 8 adalah sebuah SUV 7-seater yang dikenal dengan dimensi yang luas dan kenyamanan kabin yang baik, serta performa mesin yang responsif. Tiggo 8 tersedia dalam beberapa varian, termasuk varian Premium dan Pro. Mesinnya, 1.6 TGDI, mampu menghasilkan tenaga 186 HP dan torsi 290 Nm. Tiggo 8 juga dikenal dengan fitur-fitur keamanan yang lengkap, seperti central locking, power door locks, dan anti-theft device. ', 'Tigoo 8.jpg'),
+(17, 'Chery Tiggo 8 Pro', 20, 598800000, 'Chery Tiggo 8 Pro adalah sebuah SUV yang menawarkan kombinasi antara desain mewah, ruang kabin yang luas, dan performa yang bertenaga. Mobil ini dilengkapi dengan mesin 2.0L TGDI yang mampu menghasilkan tenaga hingga 250 HP, serta transmisi 7-Speed Dual Clutch,', 'tigoo 8 pro.jpg'),
+(18, 'Chery Tiggo 7 Pro', 20, 299800000, 'Chery Tiggo 7 Pro adalah sebuah SUV kompak yang menawarkan kombinasi antara performa yang baik, interior yang nyaman, dan beragam fitur canggih. Mobil ini hadir dengan mesin 1.5 TCI yang menghasilkan tenaga 155 hp dan torsi 230 Nm, serta transmisi CVT yang halus dan responsif. Spesifikasi lain termasuk dimensi 4500 mm x 1842 mm x 1705 mm, kapasitas 5 tempat duduk, dan beberapa fitur seperti sunroof panoramik, ventilated rear seats, dan engine start stop button. ', 'tigoo 7 pro.jpg');
 
 -- --------------------------------------------------------
 
@@ -133,7 +133,9 @@ INSERT INTO `requests` (`id`, `itemId`, `userId`, `status`, `createdAt`, `update
 (32, 3, 10, 'Disetujui', '2025-05-05 22:56:09', '2025-05-05 22:56:28'),
 (33, 3, 10, 'Disetujui', '2025-05-05 22:58:41', '2025-05-26 11:11:59'),
 (34, 3, 26, 'Disetujui', '2025-05-26 11:11:26', '2025-05-26 11:11:52'),
-(35, 1, 26, 'Ditolak', '2025-05-26 11:11:33', '2025-05-26 11:11:55');
+(35, 1, 26, 'Ditolak', '2025-05-26 11:11:33', '2025-05-26 11:11:55'),
+(36, 1, 26, 'Disetujui', '2025-05-27 13:18:20', '2025-05-27 13:18:34'),
+(37, 1, 26, 'Ditolak', '2025-05-27 13:18:48', '2025-05-27 13:19:00');
 
 -- --------------------------------------------------------
 
@@ -228,7 +230,7 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `requests`
 --
 ALTER TABLE `requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `users`
