@@ -72,8 +72,8 @@ $result = mysqli_query($conn, $query);
         <div class="bg-white/90 backdrop-blur-md rounded-lg shadow-xl p-6">
             <div class="flex justify-between items-center mb-6">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Laporan Pemesanan</h2>
-                    <p class="text-gray-600 mt-1">Lihat Laporan Pemesanan Mobil</p>
+                    <h2 class="text-2xl font-bold text-gray-800">List Pemesanan</h2>
+                    <p class="text-gray-600 mt-1">Kelola data pemesanan mobil</p>
                 </div>
                 
                 <div class="flex items-center gap-4">
@@ -86,7 +86,7 @@ $result = mysqli_query($conn, $query);
                     </select>
 
                     <!-- Export Button -->
-                    <a href="FilterLaporan.php" 
+                    <a href="ExportLaporan.php" 
                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200">
                         <i class="fas fa-download mr-2"></i>Export PDF
                     </a>
@@ -99,7 +99,9 @@ $result = mysqli_query($conn, $query);
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mobil</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <?php if ($_SESSION['role'] === 'Super Admin'): ?>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
@@ -113,10 +115,16 @@ $result = mysqli_query($conn, $query);
                             <tr class="hover:bg-gray-50 status-row" data-status="<?= $row['status'] ?>">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= $no++ ?></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <?= date('d/m/Y H:i', strtotime($row['createdAt'])) ?>
+                                    <?= date('d/m/Y H:i', strtotime($row['createdAt'])) ?>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900"><?= $row['customerName'] ?></div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="text-sm text-gray-900"><?= $row['mobilNama'] ?></div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">Rp <?= number_format($row['mobilHarga'], 0, ',', '.') ?></div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="status-badge <?= strtolower($row['status']) ?>-status">

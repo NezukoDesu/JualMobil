@@ -1,32 +1,22 @@
 <?php
 session_start();
 include('../DB.php');
-require_once('../utils/PDFGenerator.php');
 
+// Cek role
 if (!isset($_SESSION['username']) || ($_SESSION['role'] !== 'Super Admin' && $_SESSION['role'] !== 'Manager')) {
-    exit('Unauthorized access');
+    header("Location: ../Login.php");
+    exit;
 }
 
-$pdf = new PDFGenerator('L'); 
-$pdf->SetMargins(15, 15, 15);
-$pdf->SetCreator('JualMobil System');
-$pdf->SetAuthor($_SESSION['username']);
-$pdf->SetTitle('Laporan Pemesanan');
+// Load library TCPDF
+require_once('../tcpdf/tcpdf.php'); // pastikan path ke TCPDF benar
 
-$pdf->AddPage();
-
-$pdf->SetFont('helvetica', '', 11);
-$pdf->Cell(0, 5, 'Periode: '.date('d/m/Y'), 0, 1, 'C');
-$pdf->Ln(10);
-
-$header = array('No.', 'Tanggal', 'Customer', 'Mobil', 'Harga', 'Status');
-$widths = array(20, 35, 50, 85, 45, 35);
-
-// Get data
+// Query semua data pemesanan (tanpa filter bulan)
 $query = "SELECT 
     r.id,
     r.status,
     r.createdAt,
+    r.updatedAt,
     m.nama AS mobilNama,
     m.harga AS mobilHarga,
     u.username AS customerName
@@ -36,33 +26,46 @@ $query = "SELECT
     ORDER BY r.createdAt DESC";
 
 $result = mysqli_query($conn, $query);
-if (!$result) {
-    die("Query failed: " . mysqli_error($conn));
-}
 
-$data = array();
+// Buat PDF
+$pdf = new TCPDF();
+$pdf->SetCreator(PDF_CREATOR);
+$pdf->SetAuthor('JualMobil');
+$pdf->SetTitle('Laporan Pemesanan Keseluruhan');
+$pdf->SetMargins(10, 10, 10);
+$pdf->AddPage();
+
+// Judul
+$pdf->SetFont('helvetica', 'B', 16);
+$pdf->Cell(0, 10, 'Laporan Seluruh Pemesanan', 0, 1, 'C');
+
+// Table header
+$pdf->SetFont('helvetica', 'B', 10);
+$pdf->Ln(4);
+$pdf->Cell(10, 8, 'No', 1, 0, 'C');
+$pdf->Cell(30, 8, 'Tanggal', 1, 0, 'C');
+$pdf->Cell(35, 8, 'Customer', 1, 0, 'C');
+$pdf->Cell(35, 8, 'Mobil', 1, 0, 'C');
+$pdf->Cell(30, 8, 'Harga', 1, 0, 'C');
+$pdf->Cell(40, 8, 'Status', 1, 1, 'C');
+
+// Table body
+$pdf->SetFont('helvetica', '', 10);
 $no = 1;
 
-while($row = mysqli_fetch_assoc($result)) {
-    $data[] = array(
-        $no++,
-        date('d/m/Y H:i', strtotime($row['createdAt'])),
-        $row['customerName'],
-        $row['mobilNama'],
-        'Rp '.number_format($row['mobilHarga'], 0, ',', '.'),
-        $row['status']
-    );
+if ($result && mysqli_num_rows($result) > 0) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $pdf->Cell(10, 8, $no++, 1, 0, 'C');
+        $pdf->Cell(30, 8, date('d/m/Y', strtotime($row['createdAt'])), 1, 0, 'C');
+        $pdf->Cell(35, 8, $row['customerName'], 1, 0);
+        $pdf->Cell(35, 8, $row['mobilNama'], 1, 0);
+        $pdf->Cell(30, 8, 'Rp ' . number_format($row['mobilHarga'], 0, ',', '.'), 1, 0);
+        $pdf->Cell(40, 8, $row['status'], 1, 1);
+    }
+} else {
+    $pdf->Cell(180, 8, 'Tidak ada data pemesanan.', 1, 1, 'C');
 }
 
-$pdf->ColoredTable($header, $data, $widths);
-
-$pdf->Ln(15);
-$pdf->SetFont('helvetica', 'B', 10);
-$pdf->Cell(0, 6, 'Ringkasan:', 0, 1);
-$pdf->SetFont('helvetica', '', 10);
-$pdf->Cell(0, 6, 'Total Transaksi: '.count($data).' pemesanan', 0, 1);
-$pdf->Cell(0, 6, 'Dicetak oleh: '.$_SESSION['username'], 0, 1);
-$pdf->Cell(0, 6, 'Tanggal Cetak: '.date('d/m/Y H:i'), 0, 1);
-
-// Output
-$pdf->Output('Laporan_Pemesanan_'.date('Y-m-d_H-i').'.pdf', 'D');
+// Output PDF
+$pdf->Output('Laporan_Seluruh_Pemesanan.pdf', 'I');
+?>

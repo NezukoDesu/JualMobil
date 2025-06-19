@@ -37,6 +37,10 @@ $normalLinkClass = "text-gray-600 hover:text-blue-500 hover:border-b-2 hover:bor
                            class="py-2 px-3 <?= $currentPage === 'Laporan.php' ? $activeLinkClass : $normalLinkClass ?>">
                             <i class="fas fa-chart-bar mr-2"></i>Laporan
                         </a>
+                        <a href="/JualMobil/SuperAdmin/Pesanan.php" 
+                           class="py-2 px-3 <?= $currentPage === 'Pesanan.php' ? $activeLinkClass : $normalLinkClass ?>">
+                            <i class="fas fa-chart-bar mr-2"></i>Pesanan
+                        </a>
                     <?php endif; ?>
 
                     <?php if ($_SESSION['role'] === 'Manager'): ?>
