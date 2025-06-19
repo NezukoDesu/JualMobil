@@ -57,122 +57,83 @@ if ($selectedSalesId) {
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <title>Customer Chat</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            height: 100vh;
-            margin: 0;
-        }
-        .sidebar {
-            width: 250px;
-            background: #343a40;
-            color: white;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .sidebar h2 {
-            margin-top: 0;
-        }
-        .sidebar a {
-            color: white;
-            display: block;
-            margin: 10px 0;
-            text-decoration: none;
-            padding: 10px;
-            background: #495057;
-            border-radius: 5px;
-        }
-        .sidebar a:hover, .sidebar a.active {
-            background: #007bff;
-        }
-        .chat-container {
-            flex: 1;
-            padding: 20px;
-            background: #f8f9fa;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-        }
-        .chat-box {
-            flex: 1;
-            overflow-y: auto;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            background: white;
-            padding: 15px;
-            border-radius: 5px;
-        }
-        .message {
-            margin-bottom: 10px;
-        }
-        .message strong {
-            color: #007bff;
-        }
-        form {
-            display: flex;
-            gap: 10px;
-        }
-        input[type="text"] {
-            flex: 1;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        button {
-            padding: 10px 20px;
-            border: none;
-            background: #28a745;
-            color: white;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <title>Chat dengan Sales - JualMobil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
-    <div style="position: fixed; top: 10px; left: 10px;">
-        <a href="../index.php" style="
-            display: inline-block;
-            padding: 8px 12px;
-            background-color: #007bff;
-            color: white;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-top: 700px;
-        ">Kembali</a>
+<body class="bg-gray-50 admin-page">
+    <?php include('../Layouts/navbar.php'); ?>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto bg-white/90 backdrop-blur-md rounded-xl shadow-xl min-h-[600px] flex">
+            <!-- Sales List Sidebar -->
+            <div class="w-64 bg-gray-50 p-4 border-r border-gray-200">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Daftar Sales</h2>
+                <div class="space-y-2">
+                    <?php while ($row = mysqli_fetch_assoc($salesUsers)): ?>
+                        <a href="?to=<?= $row['id'] ?>" 
+                           class="block p-3 rounded-lg transition-colors duration-200 
+                                  <?= $selectedSalesId == $row['id'] 
+                                      ? 'bg-blue-100 text-blue-800' 
+                                      : 'hover:bg-gray-100' ?>">
+                            <i class="fas fa-user-tie mr-2"></i>
+                            <?= htmlspecialchars($row['username']) ?>
+                        </a>
+                    <?php endwhile; ?>
+                </div>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="flex-1 flex flex-col">
+                <?php if ($selectedSalesId): ?>
+                    <!-- Messages -->
+                    <div class="flex-1 p-4 overflow-y-auto space-y-4" id="chat-box">
+                        <?php foreach ($chatMessages as $msg): ?>
+                            <div class="flex <?= $msg['senderId'] == $customerId ? 'justify-end' : 'justify-start' ?>">
+                                <div class="max-w-[70%] <?= $msg['senderId'] == $customerId 
+                                    ? 'bg-blue-600 text-white' 
+                                    : 'bg-gray-100 text-gray-800' ?> rounded-lg px-4 py-2">
+                                    <div class="font-medium text-sm mb-1">
+                                        <?= htmlspecialchars($msg['sender_name']) ?>
+                                    </div>
+                                    <div><?= htmlspecialchars($msg['message']) ?></div>
+                                    <div class="text-xs mt-1 <?= $msg['senderId'] == $customerId 
+                                        ? 'text-blue-100' 
+                                        : 'text-gray-500' ?>">
+                                        <?= date('H:i', strtotime($msg['createdAt'])) ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <!-- Message Input -->
+                    <form method="post" class="p-4 border-t border-gray-200">
+                        <div class="flex gap-2">
+                            <input type="hidden" name="receiver_id" value="<?= $selectedSalesId ?>">
+                            <input type="text" name="message" 
+                                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                   placeholder="Tulis pesan..." required>
+                            <button type="submit" 
+                                    class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Kirim
+                            </button>
+                        </div>
+                    </form>
+                <?php else: ?>
+                    <div class="flex-1 flex items-center justify-center text-gray-500">
+                        <div class="text-center">
+                            <i class="fas fa-comments text-6xl mb-4"></i>
+                            <p>Pilih sales untuk memulai chat</p>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 
-    <div class="sidebar">
-        <h2>Sales List</h2>
-        <?php while ($row = mysqli_fetch_assoc($salesUsers)) { ?>
-            <a href="?to=<?= $row['id'] ?>" class="<?= $selectedSalesId == $row['id'] ? 'active' : '' ?>">
-                <?= htmlspecialchars($row['username']) ?>
-            </a>
-        <?php } ?>
-    </div>
-    <div class="chat-container">
-        <?php if ($selectedSalesId): ?>
-            <div class="chat-box">
-                <?php foreach ($chatMessages as $msg) { ?>
-                    <div class="message">
-                        <strong><?= htmlspecialchars($msg['sender_name']) ?>:</strong>
-                        <?= htmlspecialchars($msg['message']) ?>
-                        <div style="font-size: 12px; color: #888;"><?= $msg['createdAt'] ?></div>
-                    </div>
-                <?php } ?>
-            </div>
-            <form method="post">
-                <input type="hidden" name="receiver_id" value="<?= $selectedSalesId ?>">
-                <input type="text" name="message" placeholder="Tulis pesan..." required>
-                <button type="submit">Kirim</button>
-            </form>
-        <?php else: ?>
-            <h3>Pilih sales dari kiri untuk mulai chat.</h3>
-        <?php endif; ?>
-    </div>
     <script>
 const selectedSalesId = <?= json_encode($selectedSalesId) ?>;
 const chatBox = document.querySelector('.chat-box');

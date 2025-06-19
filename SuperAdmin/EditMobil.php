@@ -31,32 +31,50 @@ if ($id) {
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $nama = $_POST['nama'];
-        $stok = $_POST['stok'];
-        $harga = $_POST['harga'];
-        $keterangan = $_POST['keterangan'];
-        $gambarName = $_FILES['gambar']['name'];
+        $nama = mysqli_real_escape_string($conn, $_POST['nama']);
+        $stok = (int)$_POST['stok'];
+        $harga = (int)$_POST['harga'];
+        $keterangan = mysqli_real_escape_string($conn, $_POST['keterangan']);
+        $gambar = $mobil['gambar']; // Default to existing image
 
-        // Cek jika ada gambar baru yang diupload
-        if ($gambarName) {
-            $gambarTmp = $_FILES['gambar']['tmp_name'];
-            $gambarPath = '../uploads/' . $gambarName;
-
-            if (move_uploaded_file($gambarTmp, $gambarPath)) {
-                // Update data dengan gambar baru
-                $query = "UPDATE mobil SET nama = '$nama', stok = '$stok', harga = '$harga', keterangan = '$keterangan', gambar = '$gambarName' WHERE id = $id";
-            } else {
-                $alert = "fail";
+        // Handle image upload
+        if (isset($_FILES['gambar']) && $_FILES['gambar']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = "../uploads/";
+            
+            // Create directory if doesn't exist
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
             }
-        } else {
-            // Update tanpa mengganti gambar
-            $query = "UPDATE mobil SET nama = '$nama', stok = '$stok', harga = '$harga', keterangan = '$keterangan' WHERE id = $id";
+
+            $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+            $fileName = $_FILES['gambar']['name'];
+            $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+            if (in_array($fileExt, $allowed)) {
+                $newFileName = uniqid() . '.' . $fileExt;
+                $uploadPath = $uploadDir . $newFileName;
+
+                if (move_uploaded_file($_FILES['gambar']['tmp_name'], $uploadPath)) {
+                    // Delete old image if exists
+                    if ($mobil['gambar'] && file_exists($uploadDir . $mobil['gambar'])) {
+                        unlink($uploadDir . $mobil['gambar']);
+                    }
+                    $gambar = $newFileName;
+                }
+            }
         }
 
-        $update = mysqli_query($conn, $query);
+        // Update database
+        $query = "UPDATE mobil SET nama=?, stok=?, harga=?, keterangan=?, gambar=? WHERE id=?";
+        $stmt = mysqli_prepare($conn, $query);
+        mysqli_stmt_bind_param($stmt, 'siissi', $nama, $stok, $harga, $keterangan, $gambar, $id);
 
-        if ($update) {
-            $alert = "success";
+        if (mysqli_stmt_execute($stmt)) {
+            echo "<script>
+                alert('✅ Berhasil mengupdate mobil!');
+                window.location.href = '../Index.php';
+            </script>";
+            exit;
         } else {
             $alert = "fail";
         }
@@ -73,77 +91,106 @@ if ($id) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Edit Mobil</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <title>Edit Mobil - JualMobil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-gray-100 p-6">
-  <div class="max-w-xl mx-auto bg-white shadow-xl rounded-lg p-6">
-    <h1 class="text-2xl font-bold mb-4">Edit Mobil</h1>
+<body class="bg-gray-50 admin-page">
+    <?php include('../Layouts/navbar.php'); ?>
 
-    <!-- Preview Gambar (Landscape 4:3) -->
-    <div class="mb-4">
-      <img id="preview" src="../uploads/<?= htmlspecialchars($mobil['gambar']) ?>" class="w-full h-48 object-cover rounded border" />
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-xl p-8">
+            <div class="mb-8 text-center">
+                <h1 class="text-3xl font-bold text-gray-800">Edit Mobil</h1>
+                <p class="text-gray-600 mt-2">Edit informasi mobil <?= htmlspecialchars($mobil['nama']) ?></p>
+            </div>
+
+            <form action="" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <!-- Image Preview -->
+                <div class="relative group">
+                    <div class="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                        <img id="preview" src="../uploads/<?= htmlspecialchars($mobil['gambar']) ?>" 
+                             class="w-full h-full object-cover transition duration-300 group-hover:opacity-75" />
+                    </div>
+                    <label for="gambar" class="absolute bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-700 transition">
+                        <i class="fas fa-camera mr-2"></i>Ganti Foto
+                    </label>
+                    <input type="file" id="gambar" name="gambar" accept="image/*" class="hidden">
+                </div>
+
+                <!-- Nama -->
+                <div>
+                    <label class="block font-semibold mb-1">Nama Mobil</label>
+                    <input type="text" name="nama" value="<?= htmlspecialchars($mobil['nama']) ?>" class="border border-gray-300 p-2 w-full rounded" required>
+                </div>
+
+                <!-- Stok -->
+                <div>
+                    <label class="block font-semibold mb-1">Stok</label>
+                    <input type="number" name="stok" value="<?= htmlspecialchars($mobil['stok']) ?>" class="border border-gray-300 p-2 w-full rounded" required>
+                </div>
+
+                <!-- Harga -->
+                <div>
+                    <label class="block font-semibold mb-1">Harga</label>
+                    <input type="number" name="harga" value="<?= htmlspecialchars($mobil['harga']) ?>" class="border border-gray-300 p-2 w-full rounded" required>
+                </div>
+
+                <!-- Keterangan -->
+                <div>
+                    <label class="block font-semibold mb-1">Keterangan</label>
+                    <textarea name="keterangan" rows="4" class="border border-gray-300 p-2 w-full rounded" required minlength="200"><?= htmlspecialchars($mobil['keterangan']) ?></textarea>
+                </div>
+
+                <!-- Tombol Simpan -->
+                <div class="flex justify-end space-x-4 pt-4">
+                    <a href="../Index.php" class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Kembali
+                    </a>
+                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-save mr-2"></i>Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <form action="" method="POST" enctype="multipart/form-data" class="space-y-4">
-      <!-- Upload Gambar -->
-      <div>
-        <label class="block font-semibold mb-1">Gambar Mobil</label>
-        <input type="file" name="gambar" accept="image/*" onchange="previewImage(event)"
-               class="border border-gray-300 p-2 w-full rounded">
-      </div>
+    <script>
+document.getElementById('gambar').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        // Verify file type
+        const fileType = file.type;
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        
+        if (!validTypes.includes(fileType)) {
+            alert('❌ Tipe file tidak diizinkan! Gunakan JPG, JPEG, PNG, atau WEBP.');
+            this.value = '';
+            return;
+        }
 
-      <!-- Nama -->
-      <div>
-        <label class="block font-semibold mb-1">Nama Mobil</label>
-        <input type="text" name="nama" value="<?= htmlspecialchars($mobil['nama']) ?>" class="border border-gray-300 p-2 w-full rounded" required>
-      </div>
+        // Size limit 5MB
+        if (file.size > 5 * 1024 * 1024) {
+            alert('❌ Ukuran file terlalu besar! Maksimal 5MB.');
+            this.value = '';
+            return;
+        }
 
-      <!-- Stok -->
-      <div>
-        <label class="block font-semibold mb-1">Stok</label>
-        <input type="number" name="stok" value="<?= htmlspecialchars($mobil['stok']) ?>" class="border border-gray-300 p-2 w-full rounded" required>
-      </div>
-
-      <!-- Harga -->
-      <div>
-        <label class="block font-semibold mb-1">Harga</label>
-        <input type="number" name="harga" value="<?= htmlspecialchars($mobil['harga']) ?>" class="border border-gray-300 p-2 w-full rounded" required>
-      </div>
-
-      <!-- Keterangan -->
-      <div>
-        <label class="block font-semibold mb-1">Keterangan</label>
-        <textarea name="keterangan" rows="4" class="border border-gray-300 p-2 w-full rounded" required minlength="200"><?= htmlspecialchars($mobil['keterangan']) ?></textarea>
-      </div>
-
-      <!-- Tombol Simpan -->
-      <div class="flex justify-between items-center">
-        <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-          Simpan
-        </button>
-        <a href="../Index.php" class="text-red-600 hover:underline">← Kembali</a>
-      </div>
-    </form>
-  </div>
-
-  <script>
-    function previewImage(event) {
-      const reader = new FileReader();
-      reader.onload = function(){
-        const output = document.getElementById('preview');
-        output.src = reader.result;
-      };
-      reader.readAsDataURL(event.target.files[0]);
+        const reader = new FileReader();
+        reader.onload = function() {
+            document.getElementById('preview').src = reader.result;
+        }
+        reader.readAsDataURL(file);
     }
+});
 
-    <?php if ($alert === "success"): ?>
-      alert("✅ Berhasil edit mobil!");
-      window.location.href = "../Index.php";
-    <?php elseif ($alert === "fail"): ?>
-      alert("❌ Gagal edit mobil!");
-    <?php endif; ?>
-  </script>
+<?php if ($alert === "success"): ?>
+    alert("✅ Berhasil edit mobil!");
+    window.location.href = "../Index.php";
+<?php elseif ($alert === "fail"): ?>
+    alert("❌ Gagal edit mobil!");
+<?php endif; ?>
+</script>
 </body>
 </html>

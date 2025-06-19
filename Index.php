@@ -41,145 +41,142 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     exit; // penting supaya tidak lanjut ke output HTML
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>JualMobil</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JualMobil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-gray-100">
-  <nav class="bg-white shadow-md">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="text-xl font-bold text-blue-600">JualMobil</div>
-      <div class="hidden md:flex gap-6 items-center">
-        <a href="Index.php" class="text-gray-700 hover:text-blue-500">Home</a>
-        <?php if ($_SESSION['role'] === 'Super Admin'): ?>
-            <a href="./Manager/DataMobil.php" class="text-gray-700 hover:text-blue-500">Data Mobil</a>
-        <?php endif; ?>
-        <?php if ($_SESSION['role'] === 'Super Admin' || $_SESSION['role'] === 'Manager'): ?>
-            <a href="./SuperAdmin/DataAdmin.php" class="text-gray-700 hover:text-blue-500">Data Admin</a>
-            <a href="./SuperAdmin/Laporan.php" class="text-gray-700 hover:text-blue-500">Data Laporan</a>
-        <?php endif; ?>
-        <?php if ($_SESSION['role'] === 'Manager'): ?>
-            <a href="./Manager/Chat.php" class="text-gray-700 hover:text-blue-500">Contact Sales</a>
-        <?php endif; ?>
-        <?php if ($_SESSION['role'] === 'Sales'): ?>
-            <a href="./Sales/Chat.php" class="text-gray-700 hover:text-blue-500">Chat</a>
-        <?php endif; ?>
-        <?php if ($_SESSION['role'] === 'Customer'): ?>
-            <a href="./Cust/Request.php" class="text-gray-700 hover:text-blue-500">Pesanan</a>
-            <a href="./Cust/Chat.php" class="text-gray-700 hover:text-blue-500">Contact Sales</a>
-        <?php endif; ?>
+<body class="admin-page">
+    <?php include('Layouts/navbar.php'); ?>
 
-        <?php
-        // Ambil foto profil user
-        $userFoto = '';
-        if (isset($_SESSION['username'])) {
-            $username = $_SESSION['username'];
-            $stmt = mysqli_prepare($conn, "SELECT foto FROM users WHERE username = ?");
-            mysqli_stmt_bind_param($stmt, 's', $username);
-            mysqli_stmt_execute($stmt);
-            $res = mysqli_stmt_get_result($stmt);
-            $row = mysqli_fetch_assoc($res);
-            $userFoto = $row['foto'] ?? '';
-        }
-        $fotoPath = $userFoto && file_exists('Uploads/' . $userFoto)
-            ? 'Uploads/' . htmlspecialchars($userFoto)
-            : 'Uploads/Foto/Default.png';
-        ?>
-        <a href="Profile.php" class="block">
-          <img
-            src="<?= $fotoPath ?>"
-            alt="Foto Profil"
-            title="Profil Saya"
-            class="w-8 h-8 rounded-full object-cover border-2 border-gray-300 hover:border-red-500 transition-all"
-          />
-        </a>
-
-        <a href="Logout.php">
-          <button class="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700">Logout</button>
-        </a>
-      </div>
-    </div>
-  </nav>
-
-  <h2 class="text-2xl md:text-3xl font-bold text-blue-700 text-center mt-8 mb-2">
-    Selamat datang, <?= htmlspecialchars($_SESSION['username']) ?>!
-  </h2>
-  <p class="text-md text-gray-600 text-center mb-8">
-    Anda login sebagai <span class="font-semibold text-blue-500"><?= htmlspecialchars($_SESSION['role']) ?></span>
-  </p>
-
-  <div class="max-w-6xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold">Daftar Mobil</h1>
-      <?php if ($_SESSION['role'] === 'Super Admin'): ?>
-        <a href="./SuperAdmin/TambahMobil.php" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">+ Tambah Mobil</a>
-      <?php endif; ?>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <?php while($mobil = mysqli_fetch_assoc($query)): ?>
-        <div class="bg-white rounded shadow p-4 relative">
-          <img src="uploads/<?= htmlspecialchars($mobil['gambar']) ?>" alt="<?= htmlspecialchars($mobil['nama']) ?>" class="w-full h-48 object-cover rounded mb-4" />
-          <h2 class="text-xl font-semibold"><?= htmlspecialchars($mobil['nama']) ?></h2>
-          <p class="text-sm text-gray-600 mb-1">Stok: <?= $mobil['stok'] ?></p>
-          <p class="text-sm text-gray-600 mb-1">Harga: Rp <?= number_format($mobil['harga'], 0, ',', '.') ?></p>
-          <p class="text-sm text-gray-600 mb-4 max-h-20 overflow-y-auto"><?= htmlspecialchars($mobil['keterangan']) ?></p>
-
-          <div class="flex justify-between">
-            <?php if ($_SESSION['role'] === 'Super Admin'): ?>
-              <a href="./SuperAdmin/EditMobil.php?id=<?= $mobil['id'] ?>" class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">Edit</a>
-              <a href="javascript:void(0)" onclick="hapusMobil(<?= $mobil['id'] ?>)" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Hapus</a>
-            <?php endif; ?>
-            <?php if ($_SESSION['role'] === 'Customer'): ?>
-              <a href="./Cust/Beli.php?id=<?= $mobil['id'] ?>" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">Pesan</a>
-            <?php endif; ?>
-          </div>
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
+                Selamat datang, <?= htmlspecialchars($_SESSION['username']) ?>!
+            </h2>
+            <p class="text-lg text-gray-600">
+                Anda login sebagai <span class="font-semibold text-blue-600"><?= htmlspecialchars($_SESSION['role']) ?></span>
+            </p>
         </div>
-      <?php endwhile; ?>
+
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Katalog Mobil</h1>
+            <?php if ($_SESSION['role'] === 'Super Admin'): ?>
+                <a href="./SuperAdmin/TambahMobil.php" 
+                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i> Tambah Mobil
+                </a>
+            <?php endif; ?>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <?php while($mobil = mysqli_fetch_assoc($query)): ?>
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl">
+                    <div class="relative">
+                        <img src="uploads/<?= htmlspecialchars($mobil['gambar']) ?>" 
+                             alt="<?= htmlspecialchars($mobil['nama']) ?>" 
+                             class="w-full h-56 object-cover" />
+                        <div class="absolute top-4 right-4">
+                            <span class="px-3 py-1 bg-blue-600 text-white rounded-full text-sm">
+                                Stok: <?= $mobil['stok'] ?>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">
+                            <?= htmlspecialchars($mobil['nama']) ?>
+                        </h2>
+                        
+                        <div class="mb-4">
+                            <span class="text-2xl font-bold text-blue-600">
+                                Rp <?= number_format($mobil['harga'], 0, ',', '.') ?>
+                            </span>
+                        </div>
+
+                        <p class="text-gray-600 mb-6 line-clamp-3">
+                            <?= htmlspecialchars($mobil['keterangan']) ?>
+                        </p>
+
+                        <div class="flex justify-between items-center">
+                            <?php if ($_SESSION['role'] === 'Super Admin'): ?>
+                                <div class="space-x-2">
+                                    <a href="./SuperAdmin/EditMobil.php?id=<?= $mobil['id'] ?>" 
+                                       class="inline-flex items-center px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors duration-200">
+                                        <i class="fas fa-edit mr-2"></i> Edit
+                                    </a>
+                                    <button onclick="hapusMobil(<?= $mobil['id'] ?>)" 
+                                            class="inline-flex items-center px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200">
+                                        <i class="fas fa-trash mr-2"></i> Hapus
+                                    </button>
+                                </div>
+                            <?php endif; ?>
+                            <?php if ($_SESSION['role'] === 'Customer'): ?>
+                                <a href="./Cust/Beli.php?id=<?= $mobil['id'] ?>" 
+                                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                                    <i class="fas fa-shopping-cart mr-2"></i> Pesan
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endwhile; ?>
+        </div>
+
+        <!-- Pagination -->
+        <?php if ($totalPages > 1): ?>
+        <div class="mt-12 flex justify-center items-center gap-2">
+            <?php if ($page > 1): ?>
+                <a href="?page=<?= $page - 1 ?>" 
+                   class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+                    <i class="fas fa-chevron-left mr-2"></i> Prev
+                </a>
+            <?php endif; ?>
+
+            <div class="flex gap-1">
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <a href="?page=<?= $i ?>" 
+                       class="px-4 py-2 rounded-lg transition-colors duration-200 <?= ($i == $page) 
+                           ? 'bg-blue-600 text-white' 
+                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200' ?>">
+                        <?= $i ?>
+                    </a>
+                <?php endfor; ?>
+            </div>
+
+            <?php if ($page < $totalPages): ?>
+                <a href="?page=<?= $page + 1 ?>" 
+                   class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+                    Next <i class="fas fa-chevron-right ml-2"></i>
+                </a>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
     </div>
 
-    <!-- Pagination -->
-    <div class="mt-6 flex justify-center gap-3" style="margin-bottom: 20px;">
-      <?php if ($page > 1): ?>
-        <a href="?page=<?= $page - 1 ?>" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Prev</a>
-      <?php endif; ?>
-
-      <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-        <a href="?page=<?= $i ?>" class="px-3 py-1 rounded hover:bg-gray-300 <?= ($i == $page) ? 'bg-gray-300 font-bold' : 'bg-white' ?>">
-          <?= $i ?>
-        </a>
-      <?php endfor; ?>
-
-      <?php if ($page < $totalPages): ?>
-        <a href="?page=<?= $page + 1 ?>" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Next</a>
-      <?php endif; ?>
-    </div>
-  </div>
-
-  <script>
-    function hapusMobil(id) {
-      if (confirm("Yakin ingin menghapus mobil ini?")) {
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "<?= $_SERVER['PHP_SELF'] ?>", true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onload = function () {
-          if (xhr.status == 200) {
-            if (xhr.responseText.trim() === 'success') {
-              alert('Mobil berhasil dihapus');
-              location.reload();
-            } else {
-              alert('Gagal menghapus mobil');
+    <script>
+        function hapusMobil(id) {
+            if (confirm("Yakin ingin menghapus mobil ini?")) {
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "<?= $_SERVER['PHP_SELF'] ?>", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onload = function () {
+                    if (xhr.status == 200) {
+                        if (xhr.responseText.trim() === 'success') {
+                            alert('Mobil berhasil dihapus');
+                            location.reload();
+                        } else {
+                            alert('Gagal menghapus mobil');
+                        }
+                    }
+                };
+                xhr.send("id=" + id);
             }
-          }
-        };
-        xhr.send("id=" + id);
-      }
-    }
-  </script>
+        }
+    </script>
 </body>
 </html>

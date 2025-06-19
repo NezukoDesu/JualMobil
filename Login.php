@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $_SESSION['id'] = $user['id']; 
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
+            $_SESSION['foto'] = $user['foto']; // Add this line to store photo in session
             header("Location: Index.php");
             exit;
         } else {
@@ -28,31 +29,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
-
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
+    <title>Login - JualMobil</title>
     <link rel="stylesheet" href="./Style/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body>
-    <h2>Login Page</h2>
+<body class="auth-page">
+    <div class="auth-container">
+        <h2>Login Page</h2>
 
-    <?php if (isset($error)): ?>
-        <p class="error"><?php echo $error; ?></p>
-    <?php endif; ?>
+        <?php if (isset($error)): ?>
+            <div class="error"><?php echo $error; ?></div>
+        <?php endif; ?>
 
-    <form method="POST" action="">
-        <label>Username:</label><br>
-        <input type="text" name="username" required><br><br>
+        <form method="POST" action="">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
 
-        <button type="submit">Login</button>
-    </form>
-    <p>Belum punya akun? <a href="Register.php">Daftar di sini</a></p>
+            <button type="submit">Login</button>
+
+            <div class="auth-links">
+                <p>Belum punya akun? <a href="Register.php">Daftar Sekarang</a></p>
+            </div>
+        </form>
+    </div>
 </body>
 </html>
 

@@ -24,107 +24,105 @@ $totalPages = ceil($totalMobil / $limit);
 $query = "SELECT * FROM mobil ORDER BY id ASC LIMIT $limit OFFSET $offset";
 $result = mysqli_query($conn, $query);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Data Mobil</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <title>Data Mobil - JualMobil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
-<div class="container mt-5">
-    <h2 class="mb-4">Daftar Mobil</h2>
+<body class="bg-gray-50">
+    <?php include('../Layouts/navbar.php'); ?>
 
-    <a href="../SuperAdmin/TambahMobil.php" class="btn btn-primary mb-3">+ Tambah Mobil</a>
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Data Mobil</h2>
+                <a href="../SuperAdmin/TambahMobil.php" 
+                   class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-plus mr-2"></i>Tambah Mobil
+                </a>
+            </div>
 
-    <table class="table table-bordered">
-        <thead class="table-primary">
-            <tr>
-                <th>No</th>
-                <th>Nama Mobil</th>
-                <th>Stok</th>
-                <th>Harga</th>
-                <th>Keterangan</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody id="mobilTableBody">
-        <?php
-        if ($result && mysqli_num_rows($result) > 0) {
-            $no = $offset + 1;
-            while ($row = mysqli_fetch_assoc($result)) {
-                $shortDesc = strlen($row['keterangan']) > 20 ? substr($row['keterangan'], 0, 20) . '...' : $row['keterangan'];
-                echo "<tr id='row-{$row['id']}'>";
-                echo "<td>{$no}</td>";
-                echo "<td>{$row['nama']}</td>";
-                echo "<td>{$row['stok']}</td>";
-                echo "<td>Rp " . number_format($row['harga'], 0, ',', '.') . "</td>";
-                echo "<td>{$shortDesc}</td>";
-                echo "<td>
-                        <a href='../SuperAdmin/EditMobil.php?id={$row['id']}' class='btn btn-warning btn-sm me-2'>Edit</a>
-                        <button onclick='hapusMobil({$row['id']})' class='btn btn-danger btn-sm'>Hapus</button>
-                      </td>";
-                echo "</tr>";
-                $no++;
-            }
-        } else {
-            echo "<tr><td colspan='6' class='text-center'>Tidak ada data mobil.</td></tr>";
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Mobil</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stok</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keterangan</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <?php
+                        if ($result && mysqli_num_rows($result) > 0) {
+                            $no = $offset + 1;
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                $shortDesc = strlen($row['keterangan']) > 20 ? substr($row['keterangan'], 0, 20) . '...' : $row['keterangan'];
+                                echo "<tr id='row-{$row['id']}'>";
+                                echo "<td class='px-6 py-4 whitespace-nowrap'>{$no}</td>";
+                                echo "<td class='px-6 py-4 whitespace-nowrap'>{$row['nama']}</td>";
+                                echo "<td class='px-6 py-4 whitespace-nowrap'>{$row['stok']}</td>";
+                                echo "<td class='px-6 py-4 whitespace-nowrap'>Rp " . number_format($row['harga'], 0, ',', '.') . "</td>";
+                                echo "<td class='px-6 py-4 whitespace-nowrap'>{$shortDesc}</td>";
+                                echo "<td class='px-6 py-4 whitespace-nowrap'>
+                                        <a href='../SuperAdmin/EditMobil.php?id={$row['id']}' class='bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition'>Edit</a>
+                                        <button onclick='hapusMobil({$row['id']})' class='bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition'>Hapus</button>
+                                      </td>";
+                                echo "</tr>";
+                                $no++;
+                            }
+                        } else {
+                            echo "<tr><td colspan='6' class='text-center'>Tidak ada data mobil.</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <?php if ($totalPages > 1): ?>
+            <div class="flex justify-center mt-6 gap-2">
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <a href="?page=<?= $i ?>" 
+                       class="px-4 py-2 text-sm <?= $i == $page 
+                           ? 'bg-blue-600 text-white' 
+                           : 'bg-gray-100 text-gray-800' ?> rounded-lg hover:bg-blue-500 hover:text-white transition">
+                        <?= $i ?>
+                    </a>
+                <?php endfor; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <script>
+    function hapusMobil(id) {
+        if (confirm('Yakin ingin menghapus mobil ini?')) {
+            fetch('../SuperAdmin/HapusMobil.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'id=' + encodeURIComponent(id)
+            })
+            .then(response => response.text())
+            .then(data => {
+                if (data.trim() === 'success') {
+                    alert('Data mobil berhasil dihapus.');
+                    const row = document.getElementById('row-' + id);
+                    if (row) row.remove();
+                } else {
+                    alert('Gagal menghapus data: ' + data);
+                }
+            })
+            .catch(err => alert('Error: ' + err));
         }
-        ?>
-        </tbody>
-    </table>
-
-    <!-- Pagination -->
-    <nav>
-      <ul class="pagination justify-content-center">
-        <?php if ($page > 1): ?>
-            <li class="page-item">
-                <a class="page-link" href="?page=<?= $page - 1 ?>">Prev</a>
-            </li>
-        <?php endif; ?>
-
-        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-            <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
-                <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
-            </li>
-        <?php endfor; ?>
-
-        <?php if ($page < $totalPages): ?>
-            <li class="page-item">
-                <a class="page-link" href="?page=<?= $page + 1 ?>">Next</a>
-            </li>
-        <?php endif; ?>
-      </ul>
-    </nav>
-
-    <a href="../Index.php" class="btn btn-secondary" style="margin-bottom:20px;">Kembali</a>
-</div>
-
-<script>
-function hapusMobil(id) {
-    if (confirm('Yakin ingin menghapus mobil ini?')) {
-        fetch('../SuperAdmin/HapusMobil.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'id=' + encodeURIComponent(id)
-        })
-        .then(response => response.text())
-        .then(data => {
-            if (data.trim() === 'success') {
-                alert('Data mobil berhasil dihapus.');
-                const row = document.getElementById('row-' + id);
-                if (row) row.remove();
-            } else {
-                alert('Gagal menghapus data: ' + data);
-            }
-        })
-        .catch(err => alert('Error: ' + err));
     }
-}
-</script>
-
+    </script>
 </body>
 </html>

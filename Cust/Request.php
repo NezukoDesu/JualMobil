@@ -34,79 +34,66 @@ $stmt->bind_param('i', $userId);
 $stmt->execute();
 $result = $stmt->get_result();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Pesanan</title>
-    <!-- Link ke Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .status-disetujui {
-            background-color: #28a745;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-        .status-ditolak {
-            background-color: #dc3545;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-        .status-menunggu {
-            background-color: #ffc107;
-            color: black;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-    </style>
+    <title>Daftar Pesanan - JualMobil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
-    <div class="container mt-5">
-        <h2 class="mb-4">Daftar Pesanan</h2>
-        <table class="table table-bordered">
-            <thead>
-                <tr class="table-primary">
-                    <th>No.</th>
-                    <th>Nama Mobil</th>
-                    <th>Harga</th>
-                    <th>Tanggal Pemesanan</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if ($result->num_rows > 0) {
-                    $no = 1;
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>{$no}</td>";
-                        echo "<td>{$row['mobilNama']}</td>";
-                        echo "<td>" . number_format($row['mobilHarga'], 0, ',', '.') . "</td>";
-                        echo "<td>{$row['createdAt']}</td>";
-                        echo "<td>";
-                        if ($row['status'] == 'Disetujui') {
-                            echo "<span class='status-disetujui'>Disetujui</span>";
-                        } elseif ($row['status'] == 'Ditolak') {
-                            echo "<span class='status-ditolak'>Ditolak</span>";
+<body class="bg-gray-50 admin-page">
+    <?php include('../Layouts/navbar.php'); ?>
+
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="bg-white/90 backdrop-blur-md rounded-lg shadow-xl p-6">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Daftar Pesanan Saya</h2>
+                    <p class="text-gray-600 mt-1">Riwayat pemesanan mobil Anda</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No.</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Mobil</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Harga</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <?php
+                        if ($result->num_rows > 0) {
+                            $no = 1;
+                            while ($row = $result->fetch_assoc()): ?>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4"><?= $no++ ?></td>
+                                    <td class="px-6 py-4"><?= $row['mobilNama'] ?></td>
+                                    <td class="px-6 py-4">Rp <?= number_format($row['mobilHarga'], 0, ',', '.') ?></td>
+                                    <td class="px-6 py-4"><?= date('d/m/Y H:i', strtotime($row['createdAt'])) ?></td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-3 py-1 rounded-full text-sm font-medium
+                                            <?php echo match($row['status']) {
+                                                'Disetujui' => 'bg-green-100 text-green-800',
+                                                'Ditolak' => 'bg-red-100 text-red-800',
+                                                default => 'bg-yellow-100 text-yellow-800'
+                                            } ?>">
+                                            <?= $row['status'] ?>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <?php endwhile;
                         } else {
-                            echo "<span class='status-menunggu'>Menunggu</span>";
+                            echo "<tr><td colspan='5' class='px-6 py-4 text-center text-gray-500'>Belum ada pesanan.</td></tr>";
                         }
-                        echo "</td>";
-                        echo "</tr>";
-                        $no++;
-                    }
-                } else {
-                    echo "<tr><td colspan='5' class='text-center'>Tidak ada data.</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-        <div class="text-center mt-4">
-            <a href="../index.php" class="btn btn-secondary" style="margin-bottom:20px;">← Kembali ke Beranda</a>
+                        ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </body>

@@ -42,164 +42,119 @@ $totalPages = ceil($totalData / $limit);
 $query = "SELECT * FROM users ORDER BY id DESC LIMIT $limit OFFSET $offset";
 $result = mysqli_query($conn, $query);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Data User</title>
-    <link rel="stylesheet" href="../Style/style.css">
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            margin: auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        .header h2 {
-            text-align: center;
-        }
-
-        .styled-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .styled-table thead {
-            background-color: #f3f3f3;
-        }
-
-        .styled-table th, .styled-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .btn {
-            text-decoration: none;
-            padding: 4px 8px;
-            border-radius: 5px;
-        }
-
-        .btn.edit {
-            color: #ffc107;
-        }
-
-        .btn.delete {
-            color: #dc3545;
-        }
-
-        .pagination {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .pagination a {
-            display: inline-block;
-            padding: 8px 12px;
-            margin: 0 4px;
-            background-color: #007bff;
-            color: white;
-            border-radius: 6px;
-            text-decoration: none;
-        }
-
-        .pagination a.active {
-            background-color: #0056b3;
-        }
-
-        .back-btn {
-            display: block;
-            width: 300px;
-            margin: 30px auto 0;
-            text-align: center;
-            background-color: #2563eb;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-        }
-
-        .back-btn:hover {
-            background-color: #1e40af;
-        }
-    </style>
+    <title>Data User - JualMobil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-gray-50">
+    <?php include('../Layouts/navbar.php'); ?>
 
-<div class="container">
-    <div class="header">
-        <h2>DAFTAR PENGGUNA</h2>
-        <p>Selamat datang, <?= htmlspecialchars($_SESSION['username']); ?>!</p>
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Data Pengguna</h2>
+                <div class="flex gap-2">
+                    <a href="ExportDataAdmin.php" 
+                       class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                        <i class="fas fa-download mr-2"></i>Export PDF
+                    </a>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <?php 
+                        $no = $offset + 1; 
+                        while ($user = mysqli_fetch_assoc($result)): 
+                        ?>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap"><?= $no++; ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <img src="../Uploads/<?= $user['foto'] ?? 'Foto/Default.png' ?>" 
+                                         class="h-8 w-8 rounded-full mr-3">
+                                    <?= htmlspecialchars($user['username']); ?>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-sm rounded-full <?= 
+                                    match($user['role']) {
+                                        'Super Admin' => 'bg-red-100 text-red-800',
+                                        'Manager' => 'bg-blue-100 text-blue-800',
+                                        'Sales' => 'bg-green-100 text-green-800',
+                                        default => 'bg-gray-100 text-gray-800'
+                                    }
+                                ?>">
+                                    <?= htmlspecialchars($user['role']); ?>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <a href="EditRole.php?id=<?= $user['id'] ?>" 
+                                   class="text-blue-600 hover:text-blue-900 mr-3">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <?php if ($_SESSION['role'] === 'Super Admin'): ?>
+                                <button onclick="deleteUser(<?= $user['id'] ?>)" 
+                                        class="text-red-600 hover:text-red-900">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <?php if ($totalPages > 1): ?>
+            <div class="flex justify-center mt-6 gap-2">
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <a href="?page=<?= $i ?>" 
+                       class="px-4 py-2 text-sm <?= $i == $page 
+                           ? 'bg-blue-600 text-white' 
+                           : 'bg-gray-100 text-gray-800' ?> rounded-lg hover:bg-blue-500 hover:text-white">
+                        <?= $i ?>
+                    </a>
+                <?php endfor; ?>
+            </div>
+            <?php endif; ?>
+        </div>
     </div>
 
-    <table class="styled-table">
-        <thead>
-            <tr>
-                <th style="text-align:left">No</th>
-                <th style="text-align:left">Username</th>
-                <th style="text-align:left">Role</th>
-                <th style="text-align:left">Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php $no = $offset + 1; while ($user = mysqli_fetch_assoc($result)): ?>
-                <tr>
-                    <td><?= $no++; ?></td>
-                    <td><?= htmlspecialchars($user['username']); ?></td>
-                    <td><?= htmlspecialchars($user['role']); ?></td>
-                    <td>
-                        <a href="EditRole.php?id=<?= urlencode($user['id']); ?>" class="btn edit">✏️</a>
-                        <?php if ($_SESSION['role'] === 'Super Admin'): ?>
-                            <a href="#" class="btn delete delete-user" data-id="<?= $user['id']; ?>">🗑️</a>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endwhile; ?>
-        </tbody>
-    </table>
-
-    <!-- Pagination hanya jika data lebih dari 10 -->
-    <?php if ($totalPages > 1): ?>
-    <div class="pagination">
-        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-            <a href="?page=<?= $i ?>" class="<?= $i == $page ? 'active' : '' ?>"><?= $i ?></a>
-        <?php endfor; ?>
-    </div>
-    <?php endif; ?>
-
-    <a href="../Index.php" class="back-btn">← Kembali ke Halaman Utama</a>
-</div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).on('click', '.delete-user', function(e) {
-    e.preventDefault();
-    if (confirm('Yakin ingin menghapus?')) {
-        const id = $(this).data('id');
-        $.post('', { aksi: 'hapus_user', id: id }, function(res) {
-            if (res.trim() === 'success') {
-                location.reload();
-            } else {
-                alert('Gagal menghapus: ' + res);
-            }
-        }).fail(function() {
-            alert('Terjadi kesalahan saat menghapus.');
-        });
+    <script>
+    function deleteUser(id) {
+        if (confirm('Yakin ingin menghapus pengguna ini?')) {
+            fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `aksi=hapus_user&id=${id}`
+            })
+            .then(response => response.text())
+            .then(result => {
+                if (result.trim() === 'success') {
+                    location.reload();
+                } else {
+                    alert('Gagal menghapus pengguna');
+                }
+            });
+        }
     }
-});
-</script>
-
+    </script>
 </body>
 </html>

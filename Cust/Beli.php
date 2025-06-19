@@ -68,92 +68,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Ajukan Mobil</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-        }
-        .mobil-info {
-            margin: 20px 0;
-        }
-        .mobil-info img {
-            width: 100%;
-            max-width: 400px;
-            height: 400px;
-            object-fit: cover;
-            border-radius: 10px;
-            display: block;
-            margin: 0 auto 15px auto;
-        }
-        .mobil-info p {
-            margin: 8px 0;
-            font-size: 16px;
-        }
-        .btn-submit {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background-color: #007bff;
-            color: white;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        .btn-submit:hover {
-            background-color: #0056b3;
-        }
-        .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: #555;
-            text-decoration: none;
-        }
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <title>Pesan Mobil - JualMobil</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
-    <div class="container">
-        <h2>Ajukan Permintaan Mobil</h2>
+<body class="bg-gray-50 admin-page">
+    <?php include('../Layouts/navbar.php'); ?>
 
-        <div class="mobil-info">
-            <img src="../uploads/<?= htmlspecialchars($mobil['gambar']) ?>" alt="<?= htmlspecialchars($mobil['nama']) ?>">
-            <p><strong>Nama Mobil:</strong> <?= htmlspecialchars($mobil['nama']) ?></p>
-            <p><strong>Stok Tersedia:</strong> <?= $mobil['stok'] ?></p>
-            <p><strong>Harga:</strong> Rp<?= number_format($mobil['harga'], 0, ',', '.') ?></p>
-            <p><strong>Keterangan:</strong> <?= htmlspecialchars($mobil['keterangan']) ?></p>
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="bg-white/90 backdrop-blur-md rounded-xl shadow-xl p-8">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800">Detail Pemesanan</h2>
+                <p class="text-gray-600 mt-2">Review detail mobil sebelum mengajukan pesanan</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Image Section -->
+                <div>
+                    <img src="../uploads/<?= htmlspecialchars($mobil['gambar']) ?>" 
+                         alt="<?= htmlspecialchars($mobil['nama']) ?>"
+                         class="w-full h-[400px] object-cover rounded-lg shadow-md">
+                </div>
+
+                <!-- Details Section -->
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-2xl font-bold text-gray-800"><?= htmlspecialchars($mobil['nama']) ?></h3>
+                        <div class="mt-2 space-y-2">
+                            <p class="text-3xl font-bold text-blue-600">
+                                Rp<?= number_format($mobil['harga'], 0, ',', '.') ?>
+                            </p>
+                            <p class="inline-flex items-center text-sm text-gray-600">
+                                <i class="fas fa-car mr-2"></i>
+                                Stok: <span class="font-semibold ml-1"><?= $mobil['stok'] ?> unit</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-700 mb-2">Keterangan</h4>
+                        <p class="text-gray-600"><?= htmlspecialchars($mobil['keterangan']) ?></p>
+                    </div>
+
+                    <form method="POST" class="pt-4">
+                        <button type="submit" 
+                                class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                            <i class="fas fa-shopping-cart mr-2"></i>
+                            Ajukan Pesanan
+                        </button>
+                    </form>
+
+                    <a href="Request.php" 
+                       class="block text-center mt-4 text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Kembali ke Daftar Pesanan
+                    </a>
+                </div>
+            </div>
         </div>
-
-        <form method="POST">
-            <button type="submit" class="btn-submit">Ajukan Sekarang</button>
-        </form>
-
-        <a href="Request.php" class="back-link">← Kembali ke Daftar Permintaan</a>
     </div>
 </body>
 </html>

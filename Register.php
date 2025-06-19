@@ -36,112 +36,73 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-
-
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Register</title>
+    <title>Register - JualMobil</title>
     <link rel="stylesheet" href="./Style/style.css">
-    <style>
-    .profile-container {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-
-    .profile-img {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        object-fit: cover;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        border: 3px solid #ccc;
-    }
-
-    .profile-photo-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 20px;
-    }
-
-    .profile-photo-img {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid #ccc;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-    }
-
-    .edit-photo-btn {
-        margin-left: 15px;
-        padding: 8px 14px;
-        font-size: 14px;
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color .2s;
-    }
-
-    .edit-photo-btn:hover {
-        background-color: #0056b3;
-    }
-
-    #foto {
-        display: none;
-    }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body>
-    <h2>Halaman Register</h2>
+<body class="auth-page">
+    <div class="auth-container">
+        <h2 style="padding-bottom: 1.5vh;">Create Account</h2>
 
-    <?php if ($success): ?>
-        <p style="color: green;"><?php echo $success; ?></p>
-    <?php elseif ($error): ?>
-        <p style="color: red;"><?php echo $error; ?></p>
-    <?php endif; ?>
+        <?php if ($success): ?>
+            <div class="success"><?php echo $success; ?></div>
+        <?php endif; ?>
+        
+        <?php if ($error): ?>
+            <div class="error"><?php echo $error; ?></div>
+        <?php endif; ?>
 
-    <form method="POST" action="" enctype="multipart/form-data">
-        <!-- FOTO -->
-        <div class="profile-photo-container">
-            <img src="Uploads/Foto/Default.png" alt="Foto Profil" class="profile-photo-img" id="photo-preview">
-            <label for="foto" class="edit-photo-btn">Tambah Foto</label>
-        </div>
-        <input type="file" name="foto" id="foto" accept="image/*" onchange="previewPhoto(event)">
+        <form method="POST" action="" enctype="multipart/form-data">
+            <div class="profile-photo-container">
+                <img src="Uploads/Foto/Default.png" alt="Foto Profil" class="profile-photo-img" id="photo-preview">
+                <label for="foto" class="edit-photo-btn">Pilih Foto Profil</label>
+                <input type="file" name="foto" id="foto" accept="image/*" style="display: none;">
+            </div>
 
-        <!-- STATUS FOTO -->
-        <div id="foto-status">
-            <p style="color:red;">✱ Anda belum meng‑upload foto profil.</p>
-        </div>
+            <div id="foto-status" class="form-group">
+                <p style="color:#666; text-align: center; font-size: 0.9rem;">
+                    ✱ Belum ada foto profil terpilih
+                </p>
+            </div>
 
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br><br>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
 
-        <label>Username:</label><br>
-        <input type="text" name="username" required><br><br>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
 
-        <label>Password:</label><br>
-        <input type="password" name="password" required><br><br>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
 
-        <button type="submit">Register</button>
-    </form>
+            <button type="submit">Register</button>
 
-    <p>Sudah punya akun? <a href="Login.php">Login di sini</a></p>
+            <div class="auth-links">
+                <p>Sudah punya akun? <a href="Login.php">Login Sekarang</a></p>
+            </div>
+        </form>
+    </div>
 
     <script>
     function previewPhoto(event) {
         const reader = new FileReader();
         reader.onload = function(){
             document.getElementById("photo-preview").src = reader.result;
-            document.getElementById("foto-status").innerHTML = '<p style="color:green;">✱ Foto profil Anda sudah terpasang.</p>';
+            document.getElementById("foto-status").innerHTML = 
+                '<p style="color:#2e7d32; text-align: center; font-size: 0.9rem;">✓ Foto profil siap diupload</p>';
         };
         reader.readAsDataURL(event.target.files[0]);
     }
+
+    document.getElementById('foto').addEventListener('change', previewPhoto);
     </script>
 </body>
 </html>
